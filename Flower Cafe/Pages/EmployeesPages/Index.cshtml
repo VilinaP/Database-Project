@@ -1,0 +1,102 @@
+@page
+@model Flower_Cafe.Pages.EmployeesPages.IndexModel
+
+@{
+    ViewData["Title"] = "Employees";
+}
+
+<section class="fc-employee-hero">
+    <div>
+        <span class="fc-pill">Staff Directory</span>
+        <h1>Employees</h1>
+        <p>
+            View employee records, contact information, and current wage details.
+        </p>
+    </div>
+
+    <div class="fc-employee-hero-action">
+        <a asp-page="Create" class="btn btn-primary">Create New Employee</a>
+    </div>
+</section>
+
+<section class="fc-employee-card">
+    <div class="fc-employee-header">
+        <div>
+            <span class="fc-order-label">Employees</span>
+            <h2>Employee Records</h2>
+        </div>
+
+        <a asp-page="Create" class="fc-filter-button">+ New Employee</a>
+    </div>
+
+    @if (Model.Employees == null || !Model.Employees.Any())
+    {
+        <div class="fc-empty-state">
+            <h2>No employees found</h2>
+            <p>There are no employee records to display yet.</p>
+            <a asp-page="Create" class="btn btn-primary">Create First Employee</a>
+        </div>
+    }
+    else
+    {
+        <div class="fc-employee-list">
+            @foreach (var item in Model.Employees)
+            {
+                var currentWageRate = item.WageRates
+                    .OrderByDescending(w => w.StartDate)
+                    .FirstOrDefault();
+
+                var wageText = currentWageRate != null
+                    ? currentWageRate.Wage.ToString("C")
+                    : "No wage listed";
+
+                var wageTypeText = currentWageRate != null
+                    ? currentWageRate.WageType
+                    : "-";
+
+                var maskedSsn = string.IsNullOrWhiteSpace(item.Ssn)
+                    ? "-"
+                    : "***-**-" + item.Ssn.Substring(Math.Max(0, item.Ssn.Length - 4));
+
+                <article class="fc-employee-row">
+                    <div class="fc-employee-main">
+                        <span class="fc-order-label">Staff #@item.EmployeesId</span>
+                        <h3>@item.FirstName @item.LastName</h3>
+
+                        <p>
+                            @item.Street, @item.City, @item.State @item.Zip
+                        </p>
+                    </div>
+
+                    <div class="fc-employee-meta">
+                        <div>
+                            <span>Date of Birth</span>
+                            <strong>@item.DateOfBirth</strong>
+                        </div>
+
+                        <div>
+                            <span>SSN</span>
+                            <strong>@maskedSsn</strong>
+                        </div>
+
+                        <div>
+                            <span>Current Wage</span>
+                            <strong>@wageText</strong>
+                        </div>
+
+                        <div>
+                            <span>Wage Type</span>
+                            <strong>@wageTypeText</strong>
+                        </div>
+                    </div>
+
+                    <div class="fc-employee-actions">
+                        <a asp-page="./Details" asp-route-id="@item.EmployeesId">Details</a>
+                        <a asp-page="./Edit" asp-route-id="@item.EmployeesId">Edit</a>
+                        <a asp-page="./Delete" asp-route-id="@item.EmployeesId">Delete</a>
+                    </div>
+                </article>
+            }
+        </div>
+    }
+</section>

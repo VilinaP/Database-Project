@@ -1,0 +1,122 @@
+@page
+@model Flower_Cafe.Pages.EmployeesPages.DeleteModel
+
+@{
+    ViewData["Title"] = "Delete Employee";
+
+    var employeeName = Model.Employees.FirstName + " " + Model.Employees.LastName;
+
+    var maskedSsn = string.IsNullOrWhiteSpace(Model.Employees.Ssn)
+        ? "-"
+        : "***-**-" + Model.Employees.Ssn.Substring(Math.Max(0, Model.Employees.Ssn.Length - 4));
+}
+
+<section class="fc-employee-delete-hero">
+    <div>
+        <span class="fc-pill">Delete Employee</span>
+        <h1>Delete Employee</h1>
+        <p>
+            Review this employee record before removing it from the system.
+        </p>
+    </div>
+
+    <div class="fc-employee-delete-id">
+        Staff #@Model.Employees.EmployeesId
+    </div>
+</section>
+
+<section class="fc-employee-delete-card">
+    <div class="fc-delete-warning-box">
+        <span class="fc-delete-small-label">Warning</span>
+
+        <h2>Are you sure you want to delete this employee?</h2>
+
+        <p>
+            This will delete <strong>@employeeName</strong> and all wage rates attached to this employee.
+        </p>
+    </div>
+
+    <div class="fc-delete-summary-table">
+        <div>
+            <span>Name</span>
+            <strong>@employeeName</strong>
+        </div>
+
+        <div>
+            <span>Date of Birth</span>
+            <strong>@Model.Employees.DateOfBirth</strong>
+        </div>
+
+        <div>
+            <span>SSN</span>
+            <strong>@maskedSsn</strong>
+        </div>
+
+        <div>
+            <span>Street</span>
+            <strong>@Model.Employees.Street</strong>
+        </div>
+
+        <div>
+            <span>City</span>
+            <strong>@Model.Employees.City</strong>
+        </div>
+
+        <div>
+            <span>State / Zip</span>
+            <strong>@Model.Employees.State @Model.Employees.Zip</strong>
+        </div>
+    </div>
+
+    <div class="fc-employee-delete-section">
+        <div class="fc-section-title-row">
+            <div>
+                <span class="fc-order-label">Wage Rates</span>
+                <h2>Records That Will Also Be Deleted</h2>
+            </div>
+
+            <span class="fc-order-date-pill">
+                @Model.WageRates.Count item@(Model.WageRates.Count == 1 ? "" : "s")
+            </span>
+        </div>
+
+        @if (Model.WageRates.Any())
+        {
+            <div class="fc-employee-wage-history">
+                @foreach (var wageRate in Model.WageRates)
+                {
+                    <article class="fc-employee-wage-row">
+                        <div>
+                            <span>Start Date</span>
+                            <strong>@wageRate.StartDate</strong>
+                        </div>
+
+                        <div>
+                            <span>Wage</span>
+                            <strong>@wageRate.Wage.ToString("C")</strong>
+                        </div>
+
+                        <div>
+                            <span>Wage Type</span>
+                            <strong>@wageRate.WageType</strong>
+                        </div>
+                    </article>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="fc-empty-state">
+                <h2>No wage rates found</h2>
+                <p>No wage rates are attached to this employee.</p>
+            </div>
+        }
+    </div>
+
+    <form method="post" class="fc-employee-delete-actions">
+        <input type="hidden" name="id" value="@Model.Employees.EmployeesId" />
+
+        <input type="submit" value="Delete Employee" class="btn btn-danger" />
+        <a asp-page="./Index" class="btn btn-secondary">Cancel</a>
+    </form>
+</section>

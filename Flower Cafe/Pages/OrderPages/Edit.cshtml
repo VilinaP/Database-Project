@@ -1,0 +1,232 @@
+@page
+@model Flower_Cafe.Pages.OrderPages.EditModel
+
+@{
+    ViewData["Title"] = "Edit Order";
+}
+
+<section class="fc-create-order-hero">
+    <div>
+        <span class="fc-pill">Edit Order</span>
+        <h1>Edit Order</h1>
+        <p>
+            Update the customer, menu items, and quantities for this order.
+        </p>
+    </div>
+
+    <div class="fc-create-order-hero-action">
+        <a asp-page="./Index" class="btn btn-secondary">Back to Orders</a>
+    </div>
+</section>
+
+<section class="fc-create-order-card">
+    <form method="post">
+        <div asp-validation-summary="All" class="text-danger fc-validation-box"></div>
+
+        <input type="hidden" asp-for="OrderId" />
+
+        <div class="fc-form-section">
+            <div class="fc-form-section-header">
+                <div>
+                    <span class="fc-order-label">Order</span>
+                    <h2>Order Information</h2>
+                </div>
+            </div>
+
+            <div class="fc-form-grid">
+                <div class="form-group">
+                    <label class="control-label">Order Date</label>
+                    <input value="@Model.OrderDate" class="form-control" readonly />
+                </div>
+
+                @if (Model.IsCustomerLogin)
+                {
+                    <input type="hidden" asp-for="CustomerId" />
+
+                    <div class="form-group">
+                        <label class="control-label">Customer</label>
+                        <input value="Your Account" class="form-control" readonly />
+                    </div>
+                }
+                else
+                {
+                    <div class="form-group">
+                        <label asp-for="CustomerId" class="control-label">Customer</label>
+                        <select asp-for="CustomerId" asp-items="Model.CustomerList" class="form-control"></select>
+                        <span asp-validation-for="CustomerId" class="text-danger"></span>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="fc-form-section">
+            <div class="fc-form-section-header">
+                <div>
+                    <span class="fc-order-label">Items</span>
+                    <h2>Order Items</h2>
+                </div>
+
+                <button type="button" class="btn btn-secondary" onclick="addItemRow()">Add Item</button>
+            </div>
+
+            <div class="fc-order-builder" id="orderItemsBody">
+                @for (int i = 0; i < Model.Items.Count; i++)
+                {
+                    var selectedTypeId = Model.GetTypeIdForMenuItem(Model.Items[i].MenuItemId);
+
+                    <div class="fc-order-builder-row">
+                        <div class="form-group">
+                            <label class="control-label">Category</label>
+                            <select class="form-control category-select" onchange="filterMenuItems(this)">
+                                <option value="">-- Select Category --</option>
+
+                                @foreach (var category in Model.CategoryList)
+                                {
+                                    if (selectedTypeId != null && category.Value == selectedTypeId.Value.ToString())
+                                    {
+                                        <option value="@category.Value" selected>@category.Text</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@category.Value">@category.Text</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+
+                        <div class="form-group fc-order-builder-item">
+                            <label class="control-label">Menu Item</label>
+                            <select name="Items[@i].MenuItemId"
+                                    class="form-control menu-item-select"
+                                    data-selected-menu-id="@Model.Items[i].MenuItemId">
+                                <option value="">-- Select Item --</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group fc-order-builder-quantity">
+                            <label class="control-label">Quantity</label>
+                            <input name="Items[@i].Quantity"
+                                   class="form-control"
+                                   type="number"
+                                   min="0"
+                                   value="@Model.Items[i].Quantity" />
+                        </div>
+
+                        <div class="fc-order-builder-remove">
+                            <button type="button" class="btn btn-danger" onclick="removeRow(this)">Remove</button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="fc-form-note">
+            <p>
+                Subtotal, sales tax, and total will be recalculated automatically when the order is saved.
+            </p>
+        </div>
+
+        <div class="fc-create-order-actions">
+            <a asp-page="./Index" class="btn btn-secondary">Cancel</a>
+            <input type="submit" value="Save Order" class="btn btn-primary" />
+        </div>
+    </form>
+</section>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        const menuItems = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MenuItemOptions));
+        const categories = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.CategoryList));
+
+        let itemIndex = @Model.Items.Count;
+
+        function buildCategoryOptions() {
+            let options = '<option value="">-- Select Category --</option>';
+
+            categories.forEach(category => {
+                options += `<option value="${category.Value}">${category.Text}</option>`;
+            });
+
+            return options;
+        }
+
+        function filterMenuItems(categorySelect) {
+            const row = categorySelect.closest(".fc-order-builder-row");
+            const menuSelect = row.querySelector(".menu-item-select");
+            const selectedTypeId = categorySelect.value;
+            const selectedMenuId = menuSelect.getAttribute("data-selected-menu-id");
+
+            menuSelect.innerHTML = '<option value="">-- Select Item --</option>';
+
+            if (selectedTypeId === "") {
+                return;
+            }
+
+            menuItems
+                .filter(item => item.TypeId.toString() === selectedTypeId)
+                .forEach(item => {
+                    const option = document.createElement("option");
+                    option.value = item.MenuItemId;
+                    option.textContent = `${item.Name} - $${Number(item.Price).toFixed(2)}`;
+
+                    if (selectedMenuId && selectedMenuId === item.MenuItemId.toString()) {
+                        option.selected = true;
+                    }
+
+                    menuSelect.appendChild(option);
+                });
+
+            menuSelect.removeAttribute("data-selected-menu-id");
+        }
+
+        function addItemRow() {
+            const container = document.getElementById("orderItemsBody");
+            const row = document.createElement("div");
+
+            row.className = "fc-order-builder-row";
+
+            row.innerHTML = `
+                        <div class="form-group">
+                            <label class="control-label">Category</label>
+                            <select class="form-control category-select" onchange="filterMenuItems(this)">
+                                ${buildCategoryOptions()}
+                            </select>
+                        </div>
+
+                        <div class="form-group fc-order-builder-item">
+                            <label class="control-label">Menu Item</label>
+                            <select name="Items[${itemIndex}].MenuItemId" class="form-control menu-item-select">
+                                <option value="">-- Select Item --</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group fc-order-builder-quantity">
+                            <label class="control-label">Quantity</label>
+                            <input name="Items[${itemIndex}].Quantity" class="form-control" type="number" min="0" value="1" />
+                        </div>
+
+                        <div class="fc-order-builder-remove">
+                            <button type="button" class="btn btn-danger" onclick="removeRow(this)">Remove</button>
+                        </div>
+                    `;
+
+            container.appendChild(row);
+            itemIndex++;
+        }
+
+        function removeRow(button) {
+            const row = button.closest(".fc-order-builder-row");
+            row.remove();
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll(".category-select").forEach(categorySelect => {
+                filterMenuItems(categorySelect);
+            });
+        });
+    </script>
+}

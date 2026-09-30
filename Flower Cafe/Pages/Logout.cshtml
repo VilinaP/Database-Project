@@ -1,0 +1,36 @@
+﻿@page
+@model Flower_Cafe.Pages.LogoutModel
+
+@{
+    ViewData["Title"] = "Logout";
+}
+
+<section class="fc-simple-page-hero">
+    <div>
+        <span class="fc-pill">Account</span>
+        <h1>Logout</h1>
+        <p>
+            You have been logged out of Flower Cafe.
+        </p>
+    </div>
+</section>
+
+<section class="fc-simple-page-card">
+    <div class="fc-section-title-row">
+        <div>
+            <span class="fc-order-label">Session Ended</span>
+            <h2>You are signed out.</h2>
+        </div>
+    </div>
+
+    <div class="fc-simple-page-content">
+        <p>
+            Return home to log in again or continue viewing public pages like the menu.
+        </p>
+    </div>
+
+    <div class="fc-simple-page-actions">
+        <a asp-page="/Index" class="btn btn-primary">Return Home</a>
+        <a asp-page="/MenuItemPages/Index" class="btn btn-secondary">View Menu</a>
+    </div>
+</section>

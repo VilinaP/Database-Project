@@ -1,0 +1,120 @@
+﻿@page
+@model Flower_Cafe.Pages.IndexModel
+
+@{
+    ViewData["Title"] = "Home";
+}
+
+<section class="fc-hero">
+    <div class="fc-hero-content">
+        <span class="fc-pill">Coffee • Flowers • Fresh Food</span>
+
+        <h1>Flower Cafe</h1>
+
+        <p>
+            A cozy cafe experience with warm drinks, fresh menu items, and floral touches.
+        </p>
+
+        <div class="fc-hero-actions">
+            <a class="btn btn-primary" asp-page="/MenuItemPages/Index">View Menu</a>
+
+            @if (Model.IsLoggedIn)
+            {
+                <a class="btn btn-secondary" asp-page="/OrderPages/Index">View Orders</a>
+            }
+        </div>
+    </div>
+</section>
+
+@if (Model.IsLoggedIn)
+{
+    <section class="fc-card fc-home-panel">
+        <h2>Welcome back, @Model.LoggedInUsername</h2>
+
+        <p>
+            You are logged in as <strong>@Model.LoggedInRole</strong>.
+        </p>
+
+        <div class="fc-action-grid">
+            <a class="fc-action-card" asp-page="/MenuItemPages/Index">
+                <span>Browse</span>
+                <strong>View Menu</strong>
+            </a>
+
+            <a class="fc-action-card" asp-page="/OrderPages/Index">
+                <span>Manage</span>
+                <strong>View Orders</strong>
+            </a>
+
+            @if (Model.LoggedInRole == "admin" || Model.LoggedInRole == "manager")
+            {
+                <a class="fc-action-card" asp-page="/EmployeesPages/Index">
+                    <span>Admin</span>
+                    <strong>View Employees</strong>
+                </a>
+            }
+
+            <a class="fc-action-card" asp-page="/Logout">
+                <span>Account</span>
+                <strong>Logout</strong>
+            </a>
+        </div>
+    </section>
+}
+else
+{
+    <section class="fc-home-grid">
+        <div class="fc-card">
+            <span class="fc-pill">Welcome</span>
+
+            <h2>Sign in</h2>
+
+            <p>
+                Log in to view your orders and manage your account.
+            </p>
+
+            @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+            {
+                <div class="text-danger mb-3">
+                    @Model.ErrorMessage
+                </div>
+            }
+
+            <form method="post">
+                <div class="form-group mb-3">
+                    <label asp-for="Username" class="control-label"></label>
+                    <input asp-for="Username" class="form-control" />
+                    <span asp-validation-for="Username" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Password" class="control-label"></label>
+                    <input asp-for="Password" class="form-control" type="password" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <input type="submit" value="Login" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
+
+        <div class="fc-card fc-feature-card">
+            <span class="fc-pill">Today</span>
+
+            <h2>Fresh menu, warm atmosphere.</h2>
+
+            <p>
+                View the public menu without logging in. Orders require an account.
+            </p>
+
+            <a class="btn btn-secondary" asp-page="/MenuItemPages/Index">Explore Menu</a>
+        </div>
+    </section>
+}
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

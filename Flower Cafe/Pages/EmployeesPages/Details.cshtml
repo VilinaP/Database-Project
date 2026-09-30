@@ -1,0 +1,100 @@
+@page
+@model Flower_Cafe.Pages.EmployeesPages.DetailsModel
+
+@{
+    ViewData["Title"] = "Employee Details";
+}
+
+<h1>Employee Details</h1>
+
+<div>
+    <h4>Employee ID @Model.Employees.EmployeesId</h4>
+    <hr />
+
+    <dl class="row">
+        <dt class="col-sm-2">Staff ID</dt>
+        <dd class="col-sm-10">@Model.Employees.EmployeesId</dd>
+
+        <dt class="col-sm-2">First Name</dt>
+        <dd class="col-sm-10">@Model.Employees.FirstName</dd>
+
+        <dt class="col-sm-2">Last Name</dt>
+        <dd class="col-sm-10">@Model.Employees.LastName</dd>
+
+        <dt class="col-sm-2">Date of Birth</dt>
+        <dd class="col-sm-10">@Model.Employees.DateOfBirth</dd>
+
+        <dt class="col-sm-2">SSN</dt>
+        <dd class="col-sm-10">@Model.Employees.Ssn</dd>
+
+        <dt class="col-sm-2">Street</dt>
+        <dd class="col-sm-10">@Model.Employees.Street</dd>
+
+        <dt class="col-sm-2">City</dt>
+        <dd class="col-sm-10">@Model.Employees.City</dd>
+
+        <dt class="col-sm-2">State</dt>
+        <dd class="col-sm-10">@Model.Employees.State</dd>
+
+        <dt class="col-sm-2">Zip</dt>
+        <dd class="col-sm-10">@Model.Employees.Zip</dd>
+    </dl>
+
+    <hr />
+
+    <h5>Current Wage</h5>
+
+    @if (Model.CurrentWageRate != null)
+    {
+        <dl class="row">
+            <dt class="col-sm-2">Wage</dt>
+            <dd class="col-sm-10">$@Model.CurrentWageRate.Wage.ToString("0.00")</dd>
+
+            <dt class="col-sm-2">Wage Type</dt>
+            <dd class="col-sm-10">@Model.CurrentWageRate.WageType</dd>
+
+            <dt class="col-sm-2">Start Date</dt>
+            <dd class="col-sm-10">@Model.CurrentWageRate.StartDate</dd>
+        </dl>
+    }
+    else
+    {
+        <p>No wage rate found for this employee.</p>
+    }
+
+    <hr />
+
+    <h5>Wage History</h5>
+
+    @if (Model.WageRates.Any())
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Start Date</th>
+                    <th>Wage</th>
+                    <th>Wage Type</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var wageRate in Model.WageRates)
+                {
+                    <tr>
+                        <td>@wageRate.StartDate</td>
+                        <td>$@wageRate.Wage.ToString("0.00")</td>
+                        <td>@wageRate.WageType</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p>No wage history available.</p>
+    }
+</div>
+
+<div>
+    <a asp-page="./Edit" asp-route-id="@Model.Employees.EmployeesId">Edit</a> |
+    <a asp-page="./Index">Back to List</a>
+</div>

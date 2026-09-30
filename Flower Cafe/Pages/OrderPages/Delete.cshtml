@@ -1,0 +1,121 @@
+@page
+@model Flower_Cafe.Pages.OrderPages.DeleteModel
+
+@{
+    ViewData["Title"] = "Delete Order";
+
+    var subtotal = Model.Order?.SubTotal.HasValue == true ? Model.Order.SubTotal.Value.ToString("C") : "$0.00";
+    var salesTax = Model.Order?.SalesTax.HasValue == true ? Model.Order.SalesTax.Value.ToString("C") : "$0.00";
+    var total = Model.Order?.Total.HasValue == true ? Model.Order.Total.Value.ToString("C") : "$0.00";
+}
+
+<section class="fc-delete-page-header">
+    <div>
+        <span class="fc-pill">Delete Order</span>
+        <h1>Delete Order</h1>
+        <p>Confirm before removing this order from the system.</p>
+    </div>
+
+    @if (Model.Order != null)
+    {
+        <div class="fc-delete-total-pill">
+            @total
+        </div>
+    }
+</section>
+
+@if (Model.Order == null)
+{
+    <section class="fc-empty-state">
+        <h2>Order not found</h2>
+        <p>This order could not be found or may have already been deleted.</p>
+        <a asp-page="./Index" class="btn btn-secondary">Back to Orders</a>
+    </section>
+}
+else
+{
+    <section class="fc-delete-panel">
+        <div class="fc-delete-warning-box">
+            <div>
+                <span class="fc-delete-small-label">Warning</span>
+                <h2>Are you sure you want to delete this order?</h2>
+                <p>
+                    This will delete order <strong>#@Model.Order.OrderId</strong> and all items attached to it.
+                </p>
+            </div>
+        </div>
+
+        <div class="fc-delete-summary-table">
+            <div>
+                <span>Order ID</span>
+                <strong>#@Model.Order.OrderId</strong>
+            </div>
+
+            <div>
+                <span>Customer</span>
+                <strong>@Model.CustomerName</strong>
+            </div>
+
+            <div>
+                <span>Date</span>
+                <strong>@Model.Order.Date</strong>
+            </div>
+
+            <div>
+                <span>Subtotal</span>
+                <strong>@subtotal</strong>
+            </div>
+
+            <div>
+                <span>Sales Tax</span>
+                <strong>@salesTax</strong>
+            </div>
+
+            <div>
+                <span>Total</span>
+                <strong>@total</strong>
+            </div>
+        </div>
+
+        @if (Model.OrderItemsDisplay.Any())
+        {
+            <div class="fc-delete-items">
+                <div class="fc-delete-section-title">
+                    <div>
+                        <span class="fc-order-label">Items</span>
+                        <h2>Order Items</h2>
+                    </div>
+
+                    <span class="fc-order-date-pill">
+                        @Model.OrderItemsDisplay.Count item@(Model.OrderItemsDisplay.Count == 1 ? "" : "s")
+                    </span>
+                </div>
+
+                <div class="fc-delete-items-list">
+                    @foreach (var item in Model.OrderItemsDisplay)
+                    {
+                        <div class="fc-delete-item-row">
+                            <div>
+                                <span>@item.Category</span>
+                                <strong>@item.MenuItemName</strong>
+                            </div>
+
+                            <div class="fc-delete-item-meta">
+                                <span>Qty @item.Quantity</span>
+                                <span>@item.Price.ToString("C") each</span>
+                                <strong>@item.LineTotal.ToString("C")</strong>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+        <form method="post" class="fc-delete-button-row">
+            <input type="hidden" asp-for="Order.OrderId" />
+
+            <input type="submit" value="Delete Order" class="btn btn-danger" />
+            <a asp-page="./Index" class="btn btn-secondary">Cancel</a>
+        </form>
+    </section>
+}

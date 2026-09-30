@@ -1,0 +1,88 @@
+@page
+@model Flower_Cafe.Pages.OrderPages.DetailsModel
+
+@{
+    ViewData["Title"] = "Order Details";
+}
+
+<section class="fc-order-detail-hero">
+    <div>
+        <span class="fc-pill">Order Details</span>
+        <h1>Order #@Model.Order.OrderId</h1>
+        <p>
+            View customer information, ordered items, and the final total.
+        </p>
+    </div>
+
+    <div class="fc-order-detail-total">
+        @(Model.Order.Total?.ToString("C") ?? "$0.00")
+    </div>
+</section>
+
+<section class="fc-order-detail-layout">
+    <div class="fc-card fc-order-summary-card">
+        <div class="fc-section-title-row">
+            <div>
+                <span class="fc-order-label">Customer</span>
+                <h2>@Model.CustomerName</h2>
+            </div>
+
+            <div class="fc-order-date-pill">
+                @Model.Order.Date
+            </div>
+        </div>
+
+        <dl class="fc-order-total-list">
+            <div>
+                <dt>Subtotal</dt>
+                <dd>@(Model.Order.SubTotal?.ToString("C") ?? "$0.00")</dd>
+            </div>
+
+            <div>
+                <dt>Sales Tax</dt>
+                <dd>@(Model.Order.SalesTax?.ToString("C") ?? "$0.00")</dd>
+            </div>
+
+            <div>
+                <dt>Total</dt>
+                <dd>@(Model.Order.Total?.ToString("C") ?? "$0.00")</dd>
+            </div>
+        </dl>
+    </div>
+
+    <div class="fc-card">
+        <div class="fc-section-title-row">
+            <div>
+                <span class="fc-order-label">Items</span>
+                <h2>Order Items</h2>
+            </div>
+
+            <span class="fc-order-date-pill">
+                @Model.OrderItemsDisplay.Count item@(Model.OrderItemsDisplay.Count == 1 ? "" : "s")
+            </span>
+        </div>
+
+        <div class="fc-order-item-list">
+            @foreach (var item in Model.OrderItemsDisplay)
+            {
+                <article class="fc-order-item-card">
+                    <div>
+                        <span class="fc-order-label">@item.Category</span>
+                        <h3>@item.MenuItemName</h3>
+                    </div>
+
+                    <div class="fc-order-item-meta">
+                        <span>Qty @item.Quantity</span>
+                        <span>@item.Price.ToString("C") each</span>
+                        <strong>@item.LineTotal.ToString("C")</strong>
+                    </div>
+                </article>
+            }
+        </div>
+
+        <div class="fc-detail-actions">
+            <a class="btn btn-secondary" asp-page="./Index">Back to Orders</a>
+            <a class="btn btn-primary" asp-page="./Edit" asp-route-id="@Model.Order.OrderId">Edit Order</a>
+        </div>
+    </div>
+</section>

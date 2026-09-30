@@ -1,0 +1,50 @@
+@page
+@using Microsoft.AspNetCore.Http
+@model Flower_Cafe.Pages.MenuItemPages.DetailsModel
+
+@{
+    ViewData["Title"] = "Menu Item Details";
+
+    var userType = HttpContext.Session.GetString("UserType");
+    var canManageMenu = userType == "admin" || userType == "manager";
+}
+
+<section class="fc-detail-hero">
+    <div>
+        <span class="fc-pill">@Model.typename</span>
+        <h1>@Model.MenuItem.Name</h1>
+        <p>
+            View the item details, category, and price.
+        </p>
+    </div>
+
+    <div class="fc-detail-price">
+        @Model.MenuItem.Price.ToString("C")
+    </div>
+</section>
+
+<section class="fc-detail-layout fc-detail-layout-single">
+    <div class="fc-card fc-detail-card">
+        <h2>Item Details</h2>
+
+        <dl class="fc-detail-list">
+            <dt>Name</dt>
+            <dd>@Model.MenuItem.Name</dd>
+
+            <dt>Category</dt>
+            <dd>@Model.typename</dd>
+
+            <dt>Price</dt>
+            <dd>@Model.MenuItem.Price.ToString("C")</dd>
+        </dl>
+
+        <div class="fc-detail-actions">
+            <a class="btn btn-secondary" asp-page="./Index">Back to Menu</a>
+
+            @if (canManageMenu)
+            {
+                <a class="btn btn-primary" asp-page="./Edit" asp-route-id="@Model.MenuItem.MenuItemId">Edit Item</a>
+            }
+        </div>
+    </div>
+</section>

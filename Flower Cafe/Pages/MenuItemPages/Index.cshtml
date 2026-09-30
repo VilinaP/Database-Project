@@ -1,0 +1,73 @@
+@page
+@using Microsoft.AspNetCore.Http
+@model Flower_Cafe.Pages.MenuItemPages.IndexModel
+
+@{
+    ViewData["Title"] = "Menu";
+
+    var userType = HttpContext.Session.GetString("UserType");
+    var canManageMenu = userType == "admin" || userType == "manager";
+
+    var groupedMenuItems = Model.MenuItem
+        .GroupBy(item => item.TypeNavigation.TypeName)
+        .ToList();
+}
+
+<section class="fc-menu-hero">
+    <div>
+        <span class="fc-pill">Fresh Daily</span>
+        <h1>Our Menu</h1>
+        <p>
+            Browse our cafe favorites, drinks, desserts, flowers, bouquets, and plants.
+        </p>
+    </div>
+
+    @if (canManageMenu)
+    {
+        <div class="fc-menu-admin-action">
+            <a class="btn btn-primary" asp-page="./Create">Create New Item</a>
+        </div>
+    }
+</section>
+
+<section class="fc-menu-layout">
+    @foreach (var categoryGroup in groupedMenuItems)
+    {
+        <div class="fc-menu-section">
+            <div class="fc-menu-section-header">
+                <h2>@categoryGroup.Key</h2>
+                <span>@categoryGroup.Count() item@(categoryGroup.Count() == 1 ? "" : "s")</span>
+            </div>
+
+            <div class="fc-menu-grid">
+                @foreach (var item in categoryGroup)
+                {
+                    <article class="fc-menu-card">
+                        <div class="fc-menu-card-top">
+                            <div>
+                                <h3>@item.Name</h3>
+                                <p>@item.TypeNavigation.TypeName</p>
+                            </div>
+
+                            <strong>@item.Price.ToString("C")</strong>
+                        </div>
+
+                        <div class="fc-menu-card-bottom">
+                            <a class="fc-menu-details-link" asp-page="./Details" asp-route-id="@item.MenuItemId">
+                                Details
+                            </a>
+
+                            @if (canManageMenu)
+                            {
+                                <div class="fc-menu-admin-links">
+                                    <a asp-page="./Edit" asp-route-id="@item.MenuItemId">Edit</a>
+                                    <a asp-page="./Delete" asp-route-id="@item.MenuItemId">Delete</a>
+                                </div>
+                            }
+                        </div>
+                    </article>
+                }
+            </div>
+        </div>
+    }
+</section>

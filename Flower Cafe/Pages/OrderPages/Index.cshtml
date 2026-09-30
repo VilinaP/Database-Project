@@ -1,0 +1,99 @@
+@page
+@model Flower_Cafe.Pages.OrderPages.IndexModel
+
+@{
+    ViewData["Title"] = "Orders";
+}
+
+<section class="fc-orders-hero">
+    <div>
+        <span class="fc-pill">Order History</span>
+        <h1>Orders</h1>
+        <p>
+            View recent orders, totals, and order details.
+        </p>
+    </div>
+
+    <div class="fc-orders-hero-action">
+        <a asp-page="Create" class="btn btn-primary">Create New Order</a>
+    </div>
+</section>
+
+<section class="fc-order-history-card">
+    <div class="fc-order-history-header">
+        <div>
+            <span class="fc-order-label">Order History</span>
+            <h2>Recent Orders</h2>
+        </div>
+
+        <a asp-page="Create" class="fc-filter-button">+ New Order</a>
+    </div>
+
+    @if (Model.Order == null || !Model.Order.Any())
+    {
+        <div class="fc-empty-state">
+            <h2>No orders found</h2>
+            <p>There are no orders to display yet.</p>
+            <a asp-page="Create" class="btn btn-primary">Create First Order</a>
+        </div>
+    }
+    else
+    {
+        <div class="fc-order-table-wrap">
+            <table class="fc-order-table">
+                <thead>
+                    <tr>
+                        <th>Order Number</th>
+                        <th>Order Date</th>
+                        <th>Subtotal</th>
+                        <th>Sales Tax</th>
+                        <th>Total</th>
+                        <th>More</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var item in Model.Order)
+                    {
+                        var subtotal = item.SubTotal.HasValue ? item.SubTotal.Value.ToString("C") : "$0.00";
+                        var salesTax = item.SalesTax.HasValue ? item.SalesTax.Value.ToString("C") : "$0.00";
+                        var total = item.Total.HasValue ? item.Total.Value.ToString("C") : "$0.00";
+
+                        <tr>
+                            <td>
+                                <strong>#@item.OrderId</strong>
+                            </td>
+
+                            <td>
+                                @item.Date
+                            </td>
+
+                            <td>
+                                @subtotal
+                            </td>
+
+                            <td>
+                                @salesTax
+                            </td>
+
+                            <td>
+                                <span class="fc-order-status">
+                                    <span class="fc-status-dot"></span>
+                                    @total
+                                </span>
+                            </td>
+
+                            <td>
+                                <div class="fc-order-table-actions">
+                                    <a asp-page="./Details" asp-route-id="@item.OrderId">Details</a>
+                                    <a asp-page="./Edit" asp-route-id="@item.OrderId">Edit</a>
+                                    <a asp-page="./Delete" asp-route-id="@item.OrderId">Delete</a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>
